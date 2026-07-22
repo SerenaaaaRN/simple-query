@@ -8,21 +8,24 @@ export default function CategoryManager({ onClose }) {
   const updateMutation = useUpdateMenuCategory()
   const deleteMutation = useDeleteMenuCategory()
   const [editing, setEditing] = useState(null)
-  const [deleteError, setDeleteError] = useState('')
+  const [error, setError] = useState('')
 
   function handleSubmit(data) {
+    setError('')
     const mutation = editing
       ? updateMutation.mutateAsync({ id: editing.id, ...data })
       : createMutation.mutateAsync(data)
-    mutation.then(() => setEditing(null)).catch(() => {})
+    mutation
+      .then(() => setEditing(null))
+      .catch((err) => setError(err.message))
   }
 
   function handleDelete(cat) {
-    setDeleteError('')
+    setError('')
     if (!window.confirm(`Hapus kategori "${cat.name}"?`)) return
     deleteMutation.mutate(cat.id, {
       onError: (err) => {
-        setDeleteError(
+        setError(
           err.message.includes('foreign key')
             ? `Kategori "${cat.name}" masih digunakan oleh menu lain. Hapus atau pindahkan menu tersebut terlebih dahulu.`
             : err.message,
@@ -39,11 +42,11 @@ export default function CategoryManager({ onClose }) {
         key={editing?.id ?? 'new'}
         initial={editing}
         onSubmit={handleSubmit}
-        onCancel={() => setEditing(null)}
+        onCancel={() => { setEditing(null); setError('') }}
         disabled={isPending}
       />
 
-      {deleteError && <p className="form-error">{deleteError}</p>}
+      {error && <p className="form-error">{error}</p>}
 
       <div className="category-divider">Daftar Kategori</div>
 
@@ -64,7 +67,7 @@ export default function CategoryManager({ onClose }) {
               <div className="category-actions">
                 <button
                   className="btn-edit"
-                  onClick={() => setEditing(cat)}
+                  onClick={() => { setEditing(cat); setError('') }}
                 >
                   Edit
                 </button>

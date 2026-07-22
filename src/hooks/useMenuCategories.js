@@ -10,6 +10,7 @@ export function useMenuCategories() {
   return useQuery({
     queryKey: ['menuCategories'],
     queryFn: getMenuCategories,
+    staleTime: 120_000,
   })
 }
 
@@ -34,6 +35,5 @@ export function useDeleteMenuCategory() {
   return useMutation({
     mutationFn: deleteMenuCategory,
     onSuccess: () => qc.invalidateQueries({ queryKey: ['menuCategories'] }),
-    onError: (err) => err,
   })
 }

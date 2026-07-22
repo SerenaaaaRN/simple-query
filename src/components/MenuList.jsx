@@ -47,6 +47,7 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
+  const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
   const columns = useMemo(
     () => [
@@ -124,21 +125,24 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
+    onSortingChange: setSorting,
     state: {
       pagination,
       globalFilter,
       columnFilters,
+      sorting,
     },
-    initialState: { sorting: [{ id: 'name', desc: false }] },
   })
 
   function handleCategoryFilter(categoryId) {
     if (!categoryId) {
-      setColumnFilters([])
+      setColumnFilters((prev) => prev.filter((f) => f.id !== 'category'))
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
       return
     }
     const catName = categories.find((c) => c.id === categoryId)?.name ?? ''
     setColumnFilters([{ id: 'category', value: catName }])
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
   const activeCategoryId = columnFilters.find((f) => f.id === 'category')?.value ?? ''
@@ -170,7 +174,10 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
             className="search-input"
             placeholder="Cari menu..."
             value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
+            onChange={(e) => {
+              setGlobalFilter(e.target.value)
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+            }}
           />
         </div>
 
@@ -231,11 +238,11 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
         <div className="pagination">
           <div className="pagination-start">
             <span className="pagination-info">
-              {items.length > 0
+              {table.getFilteredRowModel().rows.length > 0
                 ? `${pagination.pageIndex * pagination.pageSize + 1}–${Math.min(
                     (pagination.pageIndex + 1) * pagination.pageSize,
-                    items.length,
-                  )} dari ${items.length}`
+                    table.getFilteredRowModel().rows.length,
+                  )} dari ${table.getFilteredRowModel().rows.length}`
                 : '0 item'}
             </span>
           </div>

@@ -10,6 +10,7 @@ export function useMenuItems() {
   return useQuery({
     queryKey: ['menuItems'],
     queryFn: getMenuItems,
+    staleTime: 60_000,
   })
 }
 
