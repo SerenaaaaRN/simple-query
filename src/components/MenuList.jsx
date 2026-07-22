@@ -1,76 +1,103 @@
-import { useMemo } from 'react'
-import { flexRender } from '@tanstack/react-table'
-import { useMenuItems, useDeleteMenuItem } from '../hooks/useMenuItems'
-import { useMenuCategories } from '../hooks/useMenuCategories'
-import { useMenuTable } from '../hooks/useMenuTable'
-import { formatPrice, formatVariantCount, getCategoryDisplay } from '../utils/formatters'
+import { useMemo } from "react";
+import { flexRender } from "@tanstack/react-table";
+import { useMenuItems, useDeleteMenuItem } from "../hooks/useMenuItems";
+import { useMenuCategories } from "../hooks/useMenuCategories";
+import { useMenuTable } from "../hooks/useMenuTable";
+import { formatPrice, formatVariantCount, getCategoryDisplay } from "../utils/formatters";
 
 const SortIcon = ({ direction }) => {
   return (
-    <span className={`sort-icon${!direction ? ' sort-idle' : ''}`}>
-      {direction === 'asc' ? (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <span className={`sort-icon${!direction ? " sort-idle" : ""}`}>
+      {direction === "asc" ? (
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M12 5v14M5 12l7-7 7 7" />
         </svg>
-      ) : direction === 'desc' ? (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      ) : direction === "desc" ? (
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M12 19V5M5 12l7 7 7-7" />
         </svg>
       ) : (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M8 6l6 6-6 6" />
           <path d="M12 6l6 6-6 6" />
         </svg>
       )}
     </span>
-  )
-}
+  );
+};
 
 export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
-  const { data: items = [], isLoading, isError, error, refetch } = useMenuItems()
-  const { data: categories = [] } = useMenuCategories()
-  const deleteMutation = useDeleteMenuItem()
+  const { data: items = [], isLoading, isError, error, refetch } = useMenuItems();
+  const { data: categories = [] } = useMenuCategories();
+  const deleteMutation = useDeleteMenuItem();
 
   const columns = useMemo(
     () => [
       {
-        header: 'Nama',
-        accessorKey: 'name',
+        header: "Nama",
+        accessorKey: "name",
         size: 200,
       },
       {
-        header: 'Kategori',
+        header: "Kategori",
         accessorFn: getCategoryDisplay,
-        id: 'category',
+        id: "category",
         size: 120,
       },
       {
-        header: 'Harga',
+        header: "Harga",
         accessorFn: (row) => formatPrice(row.price),
-        id: 'price',
+        id: "price",
         size: 130,
       },
       {
-        header: 'Varian',
+        header: "Varian",
         accessorFn: (row) => formatVariantCount(row.variants),
-        id: 'variants',
+        id: "variants",
         enableSorting: false,
         size: 90,
       },
       {
-        header: 'Status',
-        id: 'status',
+        header: "Status",
+        id: "status",
         enableSorting: false,
         size: 100,
         cell: ({ row }) => (
-          <span className={`badge ${row.original.is_available ? 'badge-available' : 'badge-unavailable'}`}>
-            {row.original.is_available ? 'Tersedia' : 'Habis'}
+          <span className={`badge ${row.original.is_available ? "badge-available" : "badge-unavailable"}`}>
+            {row.original.is_available ? "Tersedia" : "Habis"}
           </span>
         ),
       },
       {
-        header: 'Aksi',
-        id: 'actions',
+        header: "Aksi",
+        id: "actions",
         enableSorting: false,
         size: 150,
         cell: ({ row }) => (
@@ -82,7 +109,7 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
               className="btn-delete"
               onClick={() => {
                 if (window.confirm(`Hapus "${row.original.name}"?`)) {
-                  deleteMutation.mutate(row.original.id)
+                  deleteMutation.mutate(row.original.id);
                 }
               }}
               disabled={deleteMutation.isPending}
@@ -93,19 +120,16 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
         ),
       },
     ],
-    [onEdit, deleteMutation],
-  )
+    [onEdit, deleteMutation]
+  );
 
-  const {
-    table,
-    globalFilter,
-    selectValue,
-    handleCategoryFilter,
-    handleSearch,
-    filteredRowCount,
-  } = useMenuTable({ items, columns, categories })
+  const { table, globalFilter, selectValue, handleCategoryFilter, handleSearch, filteredRowCount } = useMenuTable({
+    items,
+    columns,
+    categories,
+  });
 
-  if (isLoading) return <p className="state-msg">Memuat data...</p>
+  if (isLoading) return <p className="state-msg">Memuat data...</p>;
   if (isError)
     return (
       <p className="state-msg error">
@@ -114,18 +138,13 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
           Coba Lagi
         </button>
       </p>
-    )
-  if (items.length === 0)
-    return <p className="state-msg">Belum ada menu. Klik "Tambah Menu" untuk memulai.</p>
+    );
+  if (items.length === 0) return <p className="state-msg">Belum ada menu. Klik "Tambah Menu" untuk memulai.</p>;
 
   return (
     <>
       <div className="table-toolbar">
         <div className="search-wrap">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
           <input
             className="search-input"
             placeholder="Cari menu..."
@@ -134,11 +153,7 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
           />
         </div>
 
-        <select
-          className="filter-select"
-          value={selectValue}
-          onChange={(e) => handleCategoryFilter(e.target.value)}
-        >
+        <select className="filter-select" value={selectValue} onChange={(e) => handleCategoryFilter(e.target.value)}>
           <option value="">Semua Kategori</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
@@ -164,12 +179,10 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
                   <th
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
-                    style={{ cursor: header.column.getCanSort() ? 'pointer' : 'default' }}
+                    style={{ cursor: header.column.getCanSort() ? "pointer" : "default" }}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
-                    {header.column.getCanSort() && (
-                      <SortIcon direction={header.column.getIsSorted()} />
-                    )}
+                    {header.column.getCanSort() && <SortIcon direction={header.column.getIsSorted()} />}
                   </th>
                 ))}
               </tr>
@@ -179,9 +192,7 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+                  <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                 ))}
               </tr>
             ))}
@@ -194,9 +205,9 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
               {filteredRowCount > 0
                 ? `${table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}–${Math.min(
                     (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                    filteredRowCount,
+                    filteredRowCount
                   )} dari ${filteredRowCount}`
-                : '0 item'}
+                : "0 item"}
             </span>
           </div>
 
@@ -207,7 +218,7 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
                 className="page-size-select"
                 value={table.getState().pagination.pageSize}
                 onChange={(e) => {
-                  table.setPageSize(Number(e.target.value))
+                  table.setPageSize(Number(e.target.value));
                 }}
               >
                 {[5, 10, 20, 50].map((size) => (
@@ -229,7 +240,16 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
                 disabled={!table.getCanPreviousPage()}
                 aria-label="Halaman sebelumnya"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M15 18l-6-6 6-6" />
                 </svg>
                 Prev
@@ -241,7 +261,16 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
                 aria-label="Halaman selanjutnya"
               >
                 Next
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>
@@ -250,5 +279,5 @@ export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};

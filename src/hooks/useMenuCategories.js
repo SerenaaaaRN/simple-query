@@ -6,6 +6,11 @@ import {
   deleteMenuCategory,
 } from '../lib/api'
 
+/**
+ * Mengambil semua kategori.
+ *
+ * @returns {UseQueryResult}
+ */
 export const useMenuCategories = () => {
   return useQuery({
     queryKey: ['menuCategories'],
@@ -14,6 +19,11 @@ export const useMenuCategories = () => {
   })
 }
 
+/**
+ * Membuat kategori baru dan invalidate cache.
+ *
+ * @returns {UseMutationResult}
+ */
 export const useCreateMenuCategory = () => {
   const qc = useQueryClient()
   return useMutation({
@@ -22,6 +32,11 @@ export const useCreateMenuCategory = () => {
   })
 }
 
+/**
+ * Mengupdate kategori dan invalidate cache.
+ *
+ * @returns {UseMutationResult}
+ */
 export const useUpdateMenuCategory = () => {
   const qc = useQueryClient()
   return useMutation({
@@ -30,6 +45,11 @@ export const useUpdateMenuCategory = () => {
   })
 }
 
+/**
+ * Menghapus kategori dan invalidate cache.
+ *
+ * @returns {UseMutationResult}
+ */
 export const useDeleteMenuCategory = () => {
   const qc = useQueryClient()
   return useMutation({

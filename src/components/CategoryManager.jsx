@@ -1,48 +1,54 @@
-import { useState } from 'react'
-import { useMenuCategories, useCreateMenuCategory, useUpdateMenuCategory, useDeleteMenuCategory } from '../hooks/useMenuCategories'
-import { CategoryForm } from './CategoryForm'
+import { useState } from "react";
+import {
+  useMenuCategories,
+  useCreateMenuCategory,
+  useUpdateMenuCategory,
+  useDeleteMenuCategory,
+} from "../hooks/useMenuCategories";
+import { CategoryForm } from "./CategoryForm";
 
 export const CategoryManager = ({ onClose }) => {
-  const { data: categories = [], isLoading } = useMenuCategories()
-  const createMutation = useCreateMenuCategory()
-  const updateMutation = useUpdateMenuCategory()
-  const deleteMutation = useDeleteMenuCategory()
-  const [editing, setEditing] = useState(null)
-  const [error, setError] = useState('')
+  const { data: categories = [], isLoading } = useMenuCategories();
+  const createMutation = useCreateMenuCategory();
+  const updateMutation = useUpdateMenuCategory();
+  const deleteMutation = useDeleteMenuCategory();
+  const [editing, setEditing] = useState(null);
+  const [error, setError] = useState("");
 
   const handleSubmit = (data) => {
-    setError('')
+    setError("");
     const mutation = editing
       ? updateMutation.mutateAsync({ id: editing.id, ...data })
-      : createMutation.mutateAsync(data)
-    mutation
-      .then(() => setEditing(null))
-      .catch((err) => setError(err.message))
-  }
+      : createMutation.mutateAsync(data);
+    mutation.then(() => setEditing(null)).catch((err) => setError(err.message));
+  };
 
   const handleDelete = (cat) => {
-    setError('')
-    if (!window.confirm(`Hapus kategori "${cat.name}"?`)) return
+    setError("");
+    if (!window.confirm(`Hapus kategori "${cat.name}"?`)) return;
     deleteMutation.mutate(cat.id, {
       onError: (err) => {
         setError(
-          err.message.includes('foreign key')
+          err.message.includes("foreign key")
             ? `Kategori "${cat.name}" masih digunakan oleh menu lain. Hapus atau pindahkan menu tersebut terlebih dahulu.`
-            : err.message,
-        )
+            : err.message
+        );
       },
-    })
-  }
+    });
+  };
 
-  const isPending = createMutation.isPending || updateMutation.isPending
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="category-manager">
       <CategoryForm
-        key={editing?.id ?? 'new'}
+        key={editing?.id ?? "new"}
         initial={editing}
         onSubmit={handleSubmit}
-        onCancel={() => { setEditing(null); setError('') }}
+        onCancel={() => {
+          setEditing(null);
+          setError("");
+        }}
         disabled={isPending}
       />
 
@@ -51,31 +57,32 @@ export const CategoryManager = ({ onClose }) => {
       <div className="category-divider">Daftar Kategori</div>
 
       {isLoading ? (
-        <p className="state-msg" style={{ padding: '24px 0' }}>Memuat...</p>
+        <p className="state-msg" style={{ padding: "24px 0" }}>
+          Memuat...
+        </p>
       ) : categories.length === 0 ? (
-        <p className="state-msg" style={{ padding: '24px 0' }}>Belum ada kategori.</p>
+        <p className="state-msg" style={{ padding: "24px 0" }}>
+          Belum ada kategori.
+        </p>
       ) : (
         <ul className="category-list">
           {categories.map((cat) => (
             <li key={cat.id} className="category-item">
               <div className="category-info">
                 <span className="category-name">{cat.name}</span>
-                {cat.display_order > 0 && (
-                  <span className="category-order">Urutan {cat.display_order}</span>
-                )}
+                {cat.display_order > 0 && <span className="category-order">Urutan {cat.display_order}</span>}
               </div>
               <div className="category-actions">
                 <button
                   className="btn-edit"
-                  onClick={() => { setEditing(cat); setError('') }}
+                  onClick={() => {
+                    setEditing(cat);
+                    setError("");
+                  }}
                 >
                   Edit
                 </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDelete(cat)}
-                  disabled={deleteMutation.isPending}
-                >
+                <button className="btn-delete" onClick={() => handleDelete(cat)} disabled={deleteMutation.isPending}>
                   Hapus
                 </button>
               </div>
@@ -84,5 +91,5 @@ export const CategoryManager = ({ onClose }) => {
         </ul>
       )}
     </div>
-  )
-}
+  );
+};

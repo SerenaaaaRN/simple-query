@@ -2,6 +2,13 @@ import { useState } from 'react'
 import { buildInitialForm, buildVariantPayload, emptyVariant } from '../utils/menu-helpers'
 import { validateMenuItem } from '../utils/validators'
 
+/**
+ * State form + validasi + submit handler menu item.
+ *
+ * @param {object|null} initial
+ * @param {function}    onSubmit
+ * @returns {object}
+ */
 export const useMenuItemForm = (initial, onSubmit) => {
   const [form, setForm] = useState(() => buildInitialForm(initial))
   const [error, setError] = useState('')

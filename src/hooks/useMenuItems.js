@@ -6,6 +6,11 @@ import {
   deleteMenuItem,
 } from '../lib/api'
 
+/**
+ * Mengambil semua menu dengan join kategori.
+ *
+ * @returns {UseQueryResult}
+ */
 export const useMenuItems = () => {
   return useQuery({
     queryKey: ['menuItems'],
@@ -14,6 +19,11 @@ export const useMenuItems = () => {
   })
 }
 
+/**
+ * Membuat menu baru dan invalidate cache.
+ *
+ * @returns {UseMutationResult}
+ */
 export const useCreateMenuItem = () => {
   const qc = useQueryClient()
   return useMutation({
@@ -22,6 +32,11 @@ export const useCreateMenuItem = () => {
   })
 }
 
+/**
+ * Mengupdate menu dan invalidate cache.
+ *
+ * @returns {UseMutationResult}
+ */
 export const useUpdateMenuItem = () => {
   const qc = useQueryClient()
   return useMutation({
@@ -30,6 +45,11 @@ export const useUpdateMenuItem = () => {
   })
 }
 
+/**
+ * Menghapus menu dengan optimistic update.
+ *
+ * @returns {UseMutationResult}
+ */
 export const useDeleteMenuItem = () => {
   const qc = useQueryClient()
   return useMutation({

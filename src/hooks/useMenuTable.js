@@ -7,6 +7,12 @@ import {
   getFilteredRowModel,
 } from '@tanstack/react-table'
 
+/**
+ * State tabel: paginasi, sorting, filter.
+ *
+ * @param {object} param
+ * @returns {object}
+ */
 export const useMenuTable = ({ items, columns, categories }) => {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [globalFilter, setGlobalFilter] = useState('')

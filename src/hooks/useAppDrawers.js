@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { useCreateMenuItem, useUpdateMenuItem } from './useMenuItems'
 
+/**
+ * State drawer + orchestration mutation menu.
+ *
+ * @returns {object}
+ */
 export const useAppDrawers = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)

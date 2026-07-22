@@ -1,19 +1,14 @@
-import { useMenuItemForm } from '../hooks/useMenuItemForm'
-import { useMenuCategories } from '../hooks/useMenuCategories'
+import { useMenuItemForm } from "../hooks/useMenuItemForm";
+import { useMenuCategories } from "../hooks/useMenuCategories";
 
 export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
-  const { data: categories = [] } = useMenuCategories()
-  const isEdit = !!initial
+  const { data: categories = [] } = useMenuCategories();
+  const isEdit = !!initial;
 
-  const {
-    form,
-    error,
-    patch,
-    handleVariantChange,
-    addVariant,
-    removeVariant,
-    handleSubmit,
-  } = useMenuItemForm(initial, onSubmit)
+  const { form, error, patch, handleVariantChange, addVariant, removeVariant, handleSubmit } = useMenuItemForm(
+    initial,
+    onSubmit
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -31,10 +26,7 @@ export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
 
       <label>
         Kategori *
-        <select
-          value={form.categoryId}
-          onChange={(e) => patch({ categoryId: e.target.value })}
-        >
+        <select value={form.categoryId} onChange={(e) => patch({ categoryId: e.target.value })}>
           <option value="">Pilih kategori</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
@@ -74,7 +66,7 @@ export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
               className="variant-name"
               placeholder="Nama varian"
               value={v.name}
-              onChange={(e) => handleVariantChange(i, 'name', e.target.value)}
+              onChange={(e) => handleVariantChange(i, "name", e.target.value)}
             />
             <input
               className="variant-price"
@@ -83,7 +75,7 @@ export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
               step="500"
               placeholder="Harga"
               value={v.price}
-              onChange={(e) => handleVariantChange(i, 'price', e.target.value)}
+              onChange={(e) => handleVariantChange(i, "price", e.target.value)}
             />
             {form.variants.length > 1 && (
               <button type="button" className="btn-danger" onClick={() => removeVariant(i)}>
@@ -98,11 +90,7 @@ export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
       </fieldset>
 
       <label className="checkbox-label">
-        <input
-          type="checkbox"
-          checked={form.isAvailable}
-          onChange={(e) => patch({ isAvailable: e.target.checked })}
-        />
+        <input type="checkbox" checked={form.isAvailable} onChange={(e) => patch({ isAvailable: e.target.checked })} />
         Tersedia
       </label>
 
@@ -111,9 +99,9 @@ export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
           Batal
         </button>
         <button type="submit" className="btn-primary">
-          {isEdit ? 'Simpan' : 'Tambah'}
+          {isEdit ? "Simpan" : "Tambah"}
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
