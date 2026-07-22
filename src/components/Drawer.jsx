@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function Drawer({ open, onClose, title, children }) {
+export const Drawer = ({ open, onClose, title, children }) => {
   const prevOpen = useRef(open)
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function Drawer({ open, onClose, title, children }) {
 
   useEffect(() => {
     if (!open) return
-    function handleKey(e) {
+    const handleKey = (e) => {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKey)

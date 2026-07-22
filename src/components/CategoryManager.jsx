@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useMenuCategories, useCreateMenuCategory, useUpdateMenuCategory, useDeleteMenuCategory } from '../hooks/useMenuCategories'
-import CategoryForm from './CategoryForm'
+import { CategoryForm } from './CategoryForm'
 
-export default function CategoryManager({ onClose }) {
+export const CategoryManager = ({ onClose }) => {
   const { data: categories = [], isLoading } = useMenuCategories()
   const createMutation = useCreateMenuCategory()
   const updateMutation = useUpdateMenuCategory()
@@ -10,7 +10,7 @@ export default function CategoryManager({ onClose }) {
   const [editing, setEditing] = useState(null)
   const [error, setError] = useState('')
 
-  function handleSubmit(data) {
+  const handleSubmit = (data) => {
     setError('')
     const mutation = editing
       ? updateMutation.mutateAsync({ id: editing.id, ...data })
@@ -20,7 +20,7 @@ export default function CategoryManager({ onClose }) {
       .catch((err) => setError(err.message))
   }
 
-  function handleDelete(cat) {
+  const handleDelete = (cat) => {
     setError('')
     if (!window.confirm(`Hapus kategori "${cat.name}"?`)) return
     deleteMutation.mutate(cat.id, {

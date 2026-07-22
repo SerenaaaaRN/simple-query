@@ -1,16 +1,11 @@
-import { useMemo, useState } from 'react'
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  getFilteredRowModel,
-  flexRender,
-} from '@tanstack/react-table'
+import { useMemo } from 'react'
+import { flexRender } from '@tanstack/react-table'
 import { useMenuItems, useDeleteMenuItem } from '../hooks/useMenuItems'
 import { useMenuCategories } from '../hooks/useMenuCategories'
+import { useMenuTable } from '../hooks/useMenuTable'
+import { formatPrice, formatVariantCount, getCategoryDisplay } from '../utils/formatters'
 
-function SortIcon({ direction }) {
+const SortIcon = ({ direction }) => {
   return (
     <span className={`sort-icon${!direction ? ' sort-idle' : ''}`}>
       {direction === 'asc' ? (
@@ -31,23 +26,10 @@ function SortIcon({ direction }) {
   )
 }
 
-function formatPrice(value) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(Number(value))
-}
-
-export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
+export const MenuList = ({ onEdit, onCreate, onCategoryManage }) => {
   const { data: items = [], isLoading, isError, error, refetch } = useMenuItems()
   const { data: categories = [] } = useMenuCategories()
   const deleteMutation = useDeleteMenuItem()
-
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
-  const [globalFilter, setGlobalFilter] = useState('')
-  const [columnFilters, setColumnFilters] = useState([])
-  const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
   const columns = useMemo(
     () => [
@@ -58,7 +40,7 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
       },
       {
         header: 'Kategori',
-        accessorFn: (row) => row.menu_categories?.name ?? '-',
+        accessorFn: getCategoryDisplay,
         id: 'category',
         size: 120,
       },
@@ -70,8 +52,7 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
       },
       {
         header: 'Varian',
-        accessorFn: (row) =>
-          Array.isArray(row.variants) ? `${row.variants.length} varian` : '-',
+        accessorFn: (row) => formatVariantCount(row.variants),
         id: 'variants',
         enableSorting: false,
         size: 90,
@@ -115,39 +96,14 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
     [onEdit, deleteMutation],
   )
 
-  const table = useReactTable({
-    data: items,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onPaginationChange: setPagination,
-    onGlobalFilterChange: setGlobalFilter,
-    onColumnFiltersChange: setColumnFilters,
-    onSortingChange: setSorting,
-    state: {
-      pagination,
-      globalFilter,
-      columnFilters,
-      sorting,
-    },
-  })
-
-  function handleCategoryFilter(categoryId) {
-    if (!categoryId) {
-      setColumnFilters((prev) => prev.filter((f) => f.id !== 'category'))
-      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-      return
-    }
-    const catName = categories.find((c) => c.id === categoryId)?.name ?? ''
-    setColumnFilters([{ id: 'category', value: catName }])
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }
-
-  const activeCategoryId = columnFilters.find((f) => f.id === 'category')?.value ?? ''
-  const categoryOption = categories.find((c) => c.name === activeCategoryId)
-  const selectValue = categoryOption?.id ?? ''
+  const {
+    table,
+    globalFilter,
+    selectValue,
+    handleCategoryFilter,
+    handleSearch,
+    filteredRowCount,
+  } = useMenuTable({ items, columns, categories })
 
   if (isLoading) return <p className="state-msg">Memuat data...</p>
   if (isError)
@@ -174,10 +130,7 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
             className="search-input"
             placeholder="Cari menu..."
             value={globalFilter}
-            onChange={(e) => {
-              setGlobalFilter(e.target.value)
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-            }}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
 
@@ -238,11 +191,11 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
         <div className="pagination">
           <div className="pagination-start">
             <span className="pagination-info">
-              {table.getFilteredRowModel().rows.length > 0
-                ? `${pagination.pageIndex * pagination.pageSize + 1}–${Math.min(
-                    (pagination.pageIndex + 1) * pagination.pageSize,
-                    table.getFilteredRowModel().rows.length,
-                  )} dari ${table.getFilteredRowModel().rows.length}`
+              {filteredRowCount > 0
+                ? `${table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}–${Math.min(
+                    (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                    filteredRowCount,
+                  )} dari ${filteredRowCount}`
                 : '0 item'}
             </span>
           </div>
@@ -252,9 +205,9 @@ export default function MenuList({ onEdit, onCreate, onCategoryManage }) {
               Tampilkan
               <select
                 className="page-size-select"
-                value={pagination.pageSize}
+                value={table.getState().pagination.pageSize}
                 onChange={(e) => {
-                  setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })
+                  table.setPageSize(Number(e.target.value))
                 }}
               >
                 {[5, 10, 20, 50].map((size) => (

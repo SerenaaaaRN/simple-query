@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useMenuItems } from '../hooks/useMenuItems'
 
-export default function MenuStats() {
+export const MenuStats = () => {
   const { data: items = [] } = useMenuItems()
 
   const stats = useMemo(() => {

@@ -6,7 +6,7 @@ import {
   deleteMenuCategory,
 } from '../lib/api'
 
-export function useMenuCategories() {
+export const useMenuCategories = () => {
   return useQuery({
     queryKey: ['menuCategories'],
     queryFn: getMenuCategories,
@@ -14,7 +14,7 @@ export function useMenuCategories() {
   })
 }
 
-export function useCreateMenuCategory() {
+export const useCreateMenuCategory = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: createMenuCategory,
@@ -22,7 +22,7 @@ export function useCreateMenuCategory() {
   })
 }
 
-export function useUpdateMenuCategory() {
+export const useUpdateMenuCategory = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: updateMenuCategory,
@@ -30,7 +30,7 @@ export function useUpdateMenuCategory() {
   })
 }
 
-export function useDeleteMenuCategory() {
+export const useDeleteMenuCategory = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMenuCategory,

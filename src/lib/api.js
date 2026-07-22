@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-export async function getMenuItems() {
+export const getMenuItems = async () => {
   const { data, error } = await supabase
     .from('menu_items')
     .select(`*, menu_categories(name)`)
@@ -9,16 +9,7 @@ export async function getMenuItems() {
   return data
 }
 
-export async function getMenuCategories() {
-  const { data, error } = await supabase
-    .from('menu_categories')
-    .select('*')
-    .order('display_order')
-  if (error) throw new Error(error.message)
-  return data
-}
-
-export async function createMenuItem(item) {
+export const createMenuItem = async (item) => {
   const { data, error } = await supabase
     .from('menu_items')
     .insert(item)
@@ -28,7 +19,7 @@ export async function createMenuItem(item) {
   return data
 }
 
-export async function updateMenuItem({ id, ...item }) {
+export const updateMenuItem = async ({ id, ...item }) => {
   const { data, error } = await supabase
     .from('menu_items')
     .update(item)
@@ -39,7 +30,7 @@ export async function updateMenuItem({ id, ...item }) {
   return data
 }
 
-export async function deleteMenuItem(id) {
+export const deleteMenuItem = async (id) => {
   const { error } = await supabase
     .from('menu_items')
     .delete()
@@ -47,7 +38,16 @@ export async function deleteMenuItem(id) {
   if (error) throw new Error(error.message)
 }
 
-export async function createMenuCategory(data) {
+export const getMenuCategories = async () => {
+  const { data, error } = await supabase
+    .from("menu_categories")
+    .select("*")
+    .order("display_order");
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export const createMenuCategory = async (data) => {
   const { data: result, error } = await supabase
     .from('menu_categories')
     .insert(data)
@@ -57,7 +57,7 @@ export async function createMenuCategory(data) {
   return result
 }
 
-export async function updateMenuCategory({ id, ...data }) {
+export const updateMenuCategory = async ({ id, ...data }) => {
   const { data: result, error } = await supabase
     .from('menu_categories')
     .update(data)
@@ -68,7 +68,7 @@ export async function updateMenuCategory({ id, ...data }) {
   return result
 }
 
-export async function deleteMenuCategory(id) {
+export const deleteMenuCategory = async (id) => {
   const { error } = await supabase
     .from('menu_categories')
     .delete()

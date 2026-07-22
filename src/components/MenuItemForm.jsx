@@ -1,91 +1,19 @@
-import { useState } from 'react'
+import { useMenuItemForm } from '../hooks/useMenuItemForm'
 import { useMenuCategories } from '../hooks/useMenuCategories'
 
-const emptyVariant = { name: '', price: '' }
-
-function buildInitial(initial) {
-  return {
-    name: initial?.name ?? '',
-    description: initial?.description ?? '',
-    categoryId: initial?.category_id ?? '',
-    price: initial?.price?.toString() ?? '',
-    isAvailable: initial?.is_available ?? true,
-    variants:
-      Array.isArray(initial?.variants) && initial.variants.length > 0
-        ? initial.variants.map((v) => ({
-            name: v.name ?? '',
-            price: v.price?.toString() ?? '',
-          }))
-        : [{ ...emptyVariant }],
-  }
-}
-
-export default function MenuItemForm({ initial, onSubmit, onCancel }) {
+export const MenuItemForm = ({ initial, onSubmit, onCancel }) => {
   const { data: categories = [] } = useMenuCategories()
   const isEdit = !!initial
 
-  const [form, setForm] = useState(() => buildInitial(initial))
-  const [error, setError] = useState('')
-
-  function patch(partial) {
-    setForm((prev) => ({ ...prev, ...partial }))
-  }
-
-  function handleVariantChange(index, field, value) {
-    setForm((prev) => {
-      const variants = [...prev.variants]
-      variants[index] = { ...variants[index], [field]: value }
-      return { ...prev, variants }
-    })
-  }
-
-  function addVariant() {
-    setForm((prev) => ({ ...prev, variants: [...prev.variants, { ...emptyVariant }] }))
-  }
-
-  function removeVariant(index) {
-    setForm((prev) => ({
-      ...prev,
-      variants: prev.variants.filter((_, i) => i !== index),
-    }))
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    setError('')
-
-    if (!form.name.trim()) {
-      setError('Nama menu wajib diisi')
-      return
-    }
-    if (!form.categoryId) {
-      setError('Kategori wajib dipilih')
-      return
-    }
-    const numericPrice = Number(form.price)
-    if (!form.price || isNaN(numericPrice) || numericPrice <= 0) {
-      setError('Harga harus berupa angka > 0')
-      return
-    }
-
-    const variantsJson = form.variants.some((v) => v.name.trim() !== '')
-      ? form.variants
-          .filter((v) => v.name.trim() !== '')
-          .map((v) => ({
-            name: v.name.trim(),
-            price: Number(v.price) || numericPrice,
-          }))
-      : null
-
-    onSubmit({
-      name: form.name.trim(),
-      description: form.description.trim() || null,
-      category_id: form.categoryId,
-      price: numericPrice,
-      is_available: form.isAvailable,
-      variants: variantsJson,
-    })
-  }
+  const {
+    form,
+    error,
+    patch,
+    handleVariantChange,
+    addVariant,
+    removeVariant,
+    handleSubmit,
+  } = useMenuItemForm(initial, onSubmit)
 
   return (
     <form onSubmit={handleSubmit}>
@@ -97,6 +25,7 @@ export default function MenuItemForm({ initial, onSubmit, onCancel }) {
           value={form.name}
           onChange={(e) => patch({ name: e.target.value })}
           autoFocus
+          placeholder="Misal: Es Kopi Susu"
         />
       </label>
 
@@ -106,7 +35,7 @@ export default function MenuItemForm({ initial, onSubmit, onCancel }) {
           value={form.categoryId}
           onChange={(e) => patch({ categoryId: e.target.value })}
         >
-          <option value="">-- Pilih Kategori --</option>
+          <option value="">Pilih kategori</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
@@ -119,10 +48,11 @@ export default function MenuItemForm({ initial, onSubmit, onCancel }) {
         Harga *
         <input
           type="number"
-          step="any"
+          min="0"
+          step="500"
           value={form.price}
           onChange={(e) => patch({ price: e.target.value })}
-          placeholder="35000"
+          placeholder="0"
         />
       </label>
 
@@ -131,22 +61,26 @@ export default function MenuItemForm({ initial, onSubmit, onCancel }) {
         <textarea
           value={form.description}
           onChange={(e) => patch({ description: e.target.value })}
-          rows={2}
+          placeholder="Opsional"
+          rows={3}
         />
       </label>
 
-      <fieldset>
-        <legend>Varian Harga (opsional)</legend>
+      <fieldset className="variants-fieldset">
+        <legend>Varian (opsional)</legend>
         {form.variants.map((v, i) => (
           <div key={i} className="variant-row">
             <input
+              className="variant-name"
               placeholder="Nama varian"
               value={v.name}
               onChange={(e) => handleVariantChange(i, 'name', e.target.value)}
             />
             <input
+              className="variant-price"
               type="number"
-              step="any"
+              min="0"
+              step="500"
               placeholder="Harga"
               value={v.price}
               onChange={(e) => handleVariantChange(i, 'price', e.target.value)}

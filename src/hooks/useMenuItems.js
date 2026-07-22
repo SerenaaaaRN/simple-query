@@ -6,7 +6,7 @@ import {
   deleteMenuItem,
 } from '../lib/api'
 
-export function useMenuItems() {
+export const useMenuItems = () => {
   return useQuery({
     queryKey: ['menuItems'],
     queryFn: getMenuItems,
@@ -14,7 +14,7 @@ export function useMenuItems() {
   })
 }
 
-export function useCreateMenuItem() {
+export const useCreateMenuItem = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: createMenuItem,
@@ -22,7 +22,7 @@ export function useCreateMenuItem() {
   })
 }
 
-export function useUpdateMenuItem() {
+export const useUpdateMenuItem = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: updateMenuItem,
@@ -30,7 +30,7 @@ export function useUpdateMenuItem() {
   })
 }
 
-export function useDeleteMenuItem() {
+export const useDeleteMenuItem = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMenuItem,
